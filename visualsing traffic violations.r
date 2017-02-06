@@ -191,46 +191,6 @@ wfreq=sort(tfreq,decreasing=T)
 #preparing a wordcloud, with minimum frequency of 100 and applying colour and rotation percentage to 30% for good visual experience 
 wordcloud(words=names(wfreq),freq=wfreq,min.freq = 100,random.order = F,rot.per = 0.3,colors = brewer.pal(8,"Dark2"))
 
-#################################AzureMl#################################################
-
-Tfv_data1$Date<-strptime(Tfv_data1$Date.Of.Stop, format = '%m/%d/%Y')
-
-
-Tfv_data1$Belts<-as.numeric(ifelse(Tfv_data1$Belts=="No",0,1))
-Convert<-function(m)
-{
-  m<-as.numeric(ifelse(m=="No",0,1))
-}
-
-Convert(Tfv_data1$Commercial.Vehicle)
-Convert(Tfv_data1$Belts)
-Convert(Tfv_data1$Accident)
-Convert(Tfv_data1$Personal.Injury)
-
-install.packages("AzureML")
-install.packages("devtools")
-library(AzureML)
-library(devtools)
-
-model<-glm(Personal.Injury~ Belts,data = Tfv_data1,family =  "binomial")
-
-Pred<-function(new)
-{
-  predict(model,new,type = "response")
-}
-
-#Pred(Tfv_data1)
-
-wsid<-"96f565f75e664458866d3117c20fe2cd"
-wsauth<-"c67a930ece464fb0ab8ec27f68be66c5"
-
-ws<-workspace(wsid,wsauth)
-
-inputs<-as.data.frame(Tfv_data1[,10])
-names(inputs)<-c("Belts")
-
-accidentwebservice<-publishWebService(ws,fun = Pred,name = "Accident",inputSchema = inputs)
-
 ##############Time series data Visualization########################
 
 install.packages("xts")
